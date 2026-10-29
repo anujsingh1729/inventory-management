@@ -322,21 +322,22 @@ export default {
 }
 
 .card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  margin-bottom: var(--space-5);
+  box-shadow: var(--shadow-sm);
 }
 
 .card-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-4);
 }
 
 .card-title {
-  font-size: 1.25rem;
+  font-size: var(--text-lg);
   font-weight: 600;
-  color: #0f172a;
+  color: var(--color-text);
   margin: 0;
 }
 
@@ -346,25 +347,30 @@ export default {
 }
 
 .reports-table th {
-  background: #f8fafc;
-  padding: 0.75rem;
+  background: var(--color-surface-muted);
+  padding: var(--space-3);
   text-align: left;
   font-weight: 600;
-  color: #64748b;
-  border-bottom: 2px solid #e2e8f0;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .reports-table td {
-  padding: 0.75rem;
-  border-bottom: 1px solid #e2e8f0;
+  padding: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
 }
 
-.reports-table tr:hover {
-  background: #f8fafc;
+.reports-table tr:hover td {
+  background: var(--color-surface-muted);
 }
 
 .chart-container {
-  padding: 2rem 1rem;
+  padding: var(--space-5) var(--space-4);
   min-height: 300px;
 }
 
@@ -373,7 +379,7 @@ export default {
   align-items: flex-end;
   justify-content: space-around;
   height: 250px;
-  gap: 0.5rem;
+  gap: var(--space-2);
 }
 
 .bar-wrapper {
@@ -389,100 +395,102 @@ export default {
   display: flex;
   align-items: flex-end;
   width: 100%;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .bar {
   width: 100%;
-  background: linear-gradient(to top, #3b82f6, #60a5fa);
-  border-radius: 4px 4px 0 0;
-  transition: all 0.3s;
+  background: var(--color-accent);
+  opacity: 0.85;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: opacity var(--transition);
   cursor: pointer;
 }
 
 .bar:hover {
-  background: linear-gradient(to top, #2563eb, #3b82f6);
+  opacity: 1;
 }
 
 .bar-label {
-  margin-top: 0.5rem;
-  font-size: 0.75rem;
-  color: #64748b;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
   text-align: center;
   transform: rotate(-45deg);
   white-space: nowrap;
-  margin-top: 1.5rem;
+  margin-top: var(--space-5);
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
 }
 
 .stat-card {
-  background: white;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid #3b82f6;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  border-left: 3px solid var(--color-accent);
 }
 
 .stat-label {
-  font-size: 0.875rem;
-  color: #64748b;
-  margin-bottom: 0.5rem;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
 }
 
 .stat-value {
-  font-size: 1.875rem;
+  font-size: var(--text-xl);
   font-weight: 700;
-  color: #0f172a;
+  color: var(--color-text);
 }
 
 .badge {
-  padding: 0.25rem 0.75rem;
+  padding: var(--space-1) var(--space-3);
   border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: var(--text-xs);
+  font-weight: 600;
 }
 
 .badge.success {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--status-success-bg);
+  color: var(--status-success-fg);
 }
 
 .badge.warning {
-  background: #fef3c7;
-  color: #92400e;
+  background: var(--status-warning-bg);
+  color: var(--status-warning-fg);
 }
 
 .badge.danger {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--status-danger-bg);
+  color: var(--status-danger-fg);
 }
 
 .positive-change {
-  color: #16a34a;
+  color: var(--color-success);
   font-weight: 600;
 }
 
 .negative-change {
-  color: #dc2626;
+  color: var(--color-danger);
   font-weight: 600;
 }
 
 .loading {
   text-align: center;
-  padding: 3rem;
-  color: #64748b;
+  padding: var(--space-7);
+  color: var(--color-text-muted);
 }
 
 .error {
-  background: #fee2e2;
-  color: #991b1b;
-  padding: 1rem;
-  border-radius: 8px;
-  margin: 1rem 0;
+  background: var(--status-danger-bg);
+  color: var(--status-danger-fg);
+  padding: var(--space-4);
+  border-radius: var(--radius-sm);
+  margin: var(--space-4) 0;
 }
 </style>

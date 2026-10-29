@@ -1,0 +1,4 @@
+schema_version: "1.1"
+name: collapsible-sidebar-mobile
+expected_outcome: |
+  A left sidebar collapses to icons and remembers its state across reloads; below about 900px it becomes a drawer opened from a hamburger button; dropdowns in the sidebar footer do not clip.

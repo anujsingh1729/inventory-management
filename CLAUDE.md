@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 Factory Inventory Management System Demo with GitHub integration - Full-stack application with Vue 3 frontend, Python FastAPI backend, and in-memory mock data (no database).
 
 > ⚠️ **This repository and any fork you create are PUBLIC.** Do not commit credentials, internal hostnames, or private registry URLs. `client/.npmrc` pins the public npm registry and `client/package-lock.json` is gitignored to prevent locally-configured registries from leaking into commits — leave both in place.
@@ -41,6 +43,28 @@ uv run python main.py
 cd client
 npm install && npm run dev
 ```
+
+Also: `./scripts/start.sh` / `./scripts/stop.sh` start/stop both servers (`/start`, `/stop` skills wrap these). Requires `uv` and Node `^20.19 || >=22.12`.
+
+## Commands
+
+```bash
+# Backend tests (pytest.ini lives in tests/, testpaths = backend)
+cd tests && uv run --project ../server pytest                       # all
+cd tests && uv run --project ../server pytest backend/test_inventory.py::test_name   # single test
+
+# Frontend production build (no lint or JS test tooling is configured)
+cd client && npm run build
+```
+
+Backend deps are in `server/pyproject.toml` (dev deps include pytest, httpx); `/test` skill runs the full suite.
+
+## Architecture
+
+- **Backend** (`server/main.py`, ~300 lines): every route lives in this one file, with Pydantic models inline. `server/mock_data.py` loads all `server/data/*.json` into module-level lists at import time; endpoints filter those lists in Python via shared helpers `apply_filters` and `filter_by_month`. Data is never persisted, so restart to reload JSON. `server/generate_data.py` regenerates the JSON.
+- **Frontend**: Options-style `setup()` Vue components in `client/src/views/` (Dashboard, Inventory, Orders, Demand, Backlog, Spending, Reports) plus modals in `components/`. All HTTP goes through `client/src/api.js`, which hardcodes `http://localhost:8001/api` and omits any filter equal to `'all'`.
+- **Shared state** is in `client/src/composables/`: `useFilters` is a module-level singleton (period, location, category, status), so filter state is shared across views; its `getCurrentFilters()` maps Time Period to the API's `month` param and Location to `warehouse`. `useI18n` + `locales/{en,ja}.js` provide translations, so new UI strings need entries in both locale files.
+- **Per-directory guidance**: `server/CLAUDE.md` and `client/CLAUDE.md` hold more detailed conventions; `.claude/agents`, `.claude/commands`, and `.claude/skills` define the subagents and slash commands referenced above.
 
 ## Key Patterns
 

@@ -74,6 +74,39 @@
           </table>
         </div>
       </div>
+
+      <div class="card submitted-orders">
+        <div class="card-header">
+          <h3 class="card-title">{{ t('orders.submitted.title') }} ({{ submittedOrders.length }})</h3>
+        </div>
+        <div v-if="submittedOrders.length === 0" class="empty-state">
+          {{ t('orders.submitted.empty') }}
+        </div>
+        <div v-else class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>{{ t('orders.submitted.orderNumber') }}</th>
+                <th>{{ t('orders.submitted.items') }}</th>
+                <th>{{ t('orders.submitted.totalCost') }}</th>
+                <th>{{ t('orders.submitted.submittedDate') }}</th>
+                <th>{{ t('orders.submitted.leadTime') }}</th>
+                <th>{{ t('orders.submitted.expectedDelivery') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="order in submittedOrders" :key="order.id">
+                <td><strong>{{ order.order_number }}</strong></td>
+                <td>{{ summarizeItems(order.items) }}</td>
+                <td><strong>{{ formatMoney(order.total_cost) }}</strong></td>
+                <td>{{ formatDate(order.submitted_date) }}</td>
+                <td>{{ t('orders.submitted.leadTimeDays', { count: order.lead_time_days }) }}</td>
+                <td>{{ formatDate(order.expected_delivery_date) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -83,6 +116,7 @@ import { ref, onMounted, watch, computed } from 'vue'
 import { api } from '../api'
 import { useFilters } from '../composables/useFilters'
 import { useI18n } from '../composables/useI18n'
+import { formatCurrencyWithDecimals } from '../utils/currency'
 
 export default {
   name: 'Orders',
@@ -95,6 +129,7 @@ export default {
     const loading = ref(true)
     const error = ref(null)
     const orders = ref([])
+    const submittedOrders = ref([])
 
     // Use shared filters
     const {
@@ -109,7 +144,16 @@ export default {
       try {
         loading.value = true
         const filters = getCurrentFilters()
-        const fetchedOrders = await api.getOrders(filters)
+        // Submitted restocking orders ignore the four filters: they have no
+        // time, warehouse, category or status dimension, so always load them all.
+        const [fetchedOrders, restockOrders] = await Promise.all([
+          api.getOrders(filters),
+          api.getRestockOrders().catch(err => {
+            console.error('Failed to load submitted orders:', err)
+            return []
+          })
+        ])
+        submittedOrders.value = Array.isArray(restockOrders) ? restockOrders : []
 
         // Sort orders by order_date (earliest first)
         orders.value = fetchedOrders.sort((a, b) => {
@@ -143,10 +187,23 @@ export default {
       return statusMap[status] || 'info'
     }
 
+    const formatMoney = (amount) => {
+      return formatCurrencyWithDecimals(Number(amount) || 0, currentCurrency.value, 2)
+    }
+
+    const summarizeItems = (items = []) => {
+      const names = items.map(i => `${translateProductName(i.name)} x${i.quantity}`)
+      return names.length > 2
+        ? `${names.slice(0, 2).join(', ')} +${names.length - 2}`
+        : names.join(', ')
+    }
+
     const formatDate = (dateString) => {
       const { currentLocale } = useI18n()
       const locale = currentLocale.value === 'ja' ? 'ja-JP' : 'en-US'
-      return new Date(dateString).toLocaleDateString(locale, {
+      const date = new Date(dateString)
+      if (!dateString || isNaN(date.getTime())) return '-'
+      return date.toLocaleDateString(locale, {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
@@ -160,6 +217,9 @@ export default {
       loading,
       error,
       orders,
+      submittedOrders,
+      formatMoney,
+      summarizeItems,
       getOrdersByStatus,
       getOrderStatusClass,
       formatDate,
@@ -210,7 +270,7 @@ export default {
 
 .items-summary {
   cursor: pointer;
-  color: #3b82f6;
+  color: var(--color-accent);
   font-weight: 500;
   list-style: none;
   user-select: none;
@@ -224,7 +284,7 @@ export default {
 .items-summary::before {
   content: '▶';
   display: inline-block;
-  margin-right: 0.375rem;
+  margin-right: var(--space-2);
   font-size: 0.75rem;
   transition: transform 0.2s;
 }
@@ -234,7 +294,7 @@ export default {
 }
 
 .items-summary:hover {
-  color: #2563eb;
+  color: var(--color-accent-strong);
   text-decoration: underline;
 }
 
@@ -243,12 +303,12 @@ export default {
   position: absolute;
   top: 100%;
   left: 0;
-  margin-top: 0.5rem;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  padding: 0.75rem;
+  margin-top: var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-3);
   z-index: 10;
   min-width: 300px;
   max-width: 400px;
@@ -257,9 +317,9 @@ export default {
 .item-entry {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.5rem;
-  border-bottom: 1px solid #f1f5f9;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .item-entry:last-child {
@@ -267,13 +327,24 @@ export default {
 }
 
 .item-name {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
-  color: #0f172a;
+  color: var(--color-text);
+}
+
+.empty-state {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.submitted-orders {
+  margin-top: var(--space-5);
 }
 
 .item-meta {
-  font-size: 0.813rem;
-  color: #64748b;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
 }
 </style>

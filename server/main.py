@@ -1,8 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from datetime import date, timedelta
 from typing import List, Optional
 from pydantic import BaseModel
-from mock_data import inventory_items, orders, demand_forecasts, backlog_items, spending_summary, monthly_spending, category_spending, recent_transactions, purchase_orders
+from mock_data import inventory_items, orders, demand_forecasts, backlog_items, spending_summary, monthly_spending, category_spending, recent_transactions, purchase_orders, submitted_orders
 
 app = FastAPI(title="Factory Inventory Management System")
 
@@ -89,6 +90,9 @@ class DemandForecast(BaseModel):
     forecasted_demand: int
     trend: str
     period: str
+    category: Optional[str] = None
+    unit_cost: Optional[float] = None
+    stock_on_hand: Optional[int] = None
 
 class BacklogItem(BaseModel):
     id: str
@@ -119,6 +123,42 @@ class CreatePurchaseOrderRequest(BaseModel):
     unit_cost: float
     expected_delivery_date: str
     notes: Optional[str] = None
+
+class RestockLine(BaseModel):
+    sku: str
+    name: str
+    category: Optional[str] = None
+    quantity: int
+    unit_cost: float
+
+class CreateRestockOrderRequest(BaseModel):
+    budget: float
+    items: List[RestockLine]
+
+class SubmittedOrder(BaseModel):
+    id: str
+    order_number: str
+    items: List[RestockLine]
+    total_cost: float
+    budget: float
+    submitted_date: str
+    lead_time_days: int
+    expected_delivery_date: str
+    status: str
+
+# Restocking lead times (days); the order ships when its slowest category arrives
+LEAD_TIME_DAYS_BY_CATEGORY = {
+    'Circuit Boards': 21,
+    'Sensors': 14,
+    'Controllers': 18,
+    'Motors': 28,
+    'Bearings': 10,
+    'Valves': 12,
+    'Gaskets': 7,
+    'Filters': 7,
+    'Widgets': 9,
+}
+DEFAULT_LEAD_TIME_DAYS = 14
 
 # API endpoints
 @app.get("/")
@@ -303,6 +343,44 @@ def get_monthly_trends():
     result = list(months.values())
     result.sort(key=lambda x: x['month'])
     return result
+
+
+@app.post("/api/restocking/orders", response_model=SubmittedOrder, status_code=201)
+def create_restock_order(request: CreateRestockOrderRequest):
+    """Submit a restocking order; lead time is the longest among the item categories"""
+    if not request.items:
+        raise HTTPException(status_code=400, detail="Order must contain at least one item")
+    if any(line.quantity <= 0 for line in request.items):
+        raise HTTPException(status_code=400, detail="Item quantities must be positive")
+
+    total_cost = round(sum(line.quantity * line.unit_cost for line in request.items), 2)
+    if total_cost > request.budget:
+        raise HTTPException(status_code=400, detail="Order total exceeds budget")
+
+    lead_time_days = max(
+        LEAD_TIME_DAYS_BY_CATEGORY.get(line.category, DEFAULT_LEAD_TIME_DAYS)
+        for line in request.items
+    )
+    today = date.today()
+    seq = len(submitted_orders) + 1
+    order = {
+        "id": str(seq),
+        "order_number": f"RST-{today.year}-{seq:04d}",
+        "items": [line.model_dump() for line in request.items],
+        "total_cost": total_cost,
+        "budget": request.budget,
+        "submitted_date": today.isoformat(),
+        "lead_time_days": lead_time_days,
+        "expected_delivery_date": (today + timedelta(days=lead_time_days)).isoformat(),
+        "status": "Submitted",
+    }
+    submitted_orders.append(order)
+    return order
+
+@app.get("/api/restocking/orders", response_model=List[SubmittedOrder])
+def get_restock_orders():
+    """Get submitted restocking orders, newest first"""
+    return list(reversed(submitted_orders))
 
 if __name__ == "__main__":
     import uvicorn
