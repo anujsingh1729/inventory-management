@@ -1,0 +1,5 @@
+description: Performance audit of all views and components
+skill: vue-optimizer
+prompt_file: prompt.md
+graders:
+  - graders/01-expected-output.md

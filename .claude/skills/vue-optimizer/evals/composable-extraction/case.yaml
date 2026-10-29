@@ -1,0 +1,5 @@
+description: Identify composable extraction opportunities across all components
+skill: vue-optimizer
+prompt_file: prompt.md
+graders:
+  - graders/01-expected-output.md
