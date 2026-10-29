@@ -6,6 +6,15 @@ export default {
     orders: 'Orders',
     finance: 'Finance',
     demandForecast: 'Demand Forecast',
+    restocking: 'Restocking',
+    reports: 'Reports',
+    mainNavigation: 'Main navigation',
+    openMenu: 'Open navigation menu',
+    closeMenu: 'Close navigation menu',
+    collapseSidebar: 'Collapse sidebar',
+    expandSidebar: 'Expand sidebar',
+    switchToDark: 'Switch to dark mode',
+    switchToLight: 'Switch to light mode',
     companyName: 'Catalyst Components',
     subtitle: 'Inventory Management System'
   },
@@ -112,6 +121,17 @@ export default {
     onTimeDelivery: 'On-Time Delivery',
     itemsCount: '{count} items',
     quantity: 'Qty',
+    submitted: {
+      title: 'Submitted Orders',
+      empty: 'No restocking orders have been submitted yet',
+      orderNumber: 'Order Number',
+      items: 'Items',
+      totalCost: 'Total Cost',
+      submittedDate: 'Submitted',
+      leadTime: 'Lead Time',
+      leadTimeDays: '{count} days',
+      expectedDelivery: 'Expected Delivery'
+    },
     table: {
       orderNumber: 'Order Number',
       orderId: 'Order ID',
@@ -188,8 +208,37 @@ export default {
     }
   },
 
+  // Restocking
+  restocking: {
+    title: 'Restocking',
+    description: 'Set a budget and review recommended restock quantities based on demand forecasts',
+    budget: 'Budget',
+    spent: 'Spent',
+    remaining: 'Remaining',
+    budgetSlider: 'Restocking budget',
+    recommendedItems: 'Recommended Items',
+    noRecommendations: 'No items fit within the current budget. Increase the budget to see recommendations.',
+    noShortfall: 'No items currently have a stock shortfall.',
+    placeOrder: 'Place Order',
+    submitting: 'Submitting...',
+    orderPlaced: 'Order placed',
+    orderSummary: 'Order {orderNumber} has been submitted. Lead time: {days} days.',
+    orderFailed: 'Failed to place order',
+    loadFailed: 'Failed to load demand forecasts',
+    table: {
+      sku: 'SKU',
+      itemName: 'Item Name',
+      category: 'Category',
+      quantity: 'Quantity',
+      unitCost: 'Unit Cost',
+      lineTotal: 'Line Total',
+      trend: 'Trend'
+    }
+  },
+
   // Filters
   filters: {
+    resetAll: 'Reset all filters',
     timePeriod: 'Time Period',
     location: 'Location',
     category: 'Category',

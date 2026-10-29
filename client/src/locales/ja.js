@@ -6,6 +6,15 @@ export default {
     orders: '注文',
     finance: '財務',
     demandForecast: '需要予測',
+    restocking: '補充発注',
+    reports: 'レポート',
+    mainNavigation: 'メインナビゲーション',
+    openMenu: 'ナビゲーションメニューを開く',
+    closeMenu: 'ナビゲーションメニューを閉じる',
+    collapseSidebar: 'サイドバーを折りたたむ',
+    expandSidebar: 'サイドバーを展開',
+    switchToDark: 'ダークモードに切り替え',
+    switchToLight: 'ライトモードに切り替え',
     companyName: '触媒コンポーネンツ',
     subtitle: '在庫管理システム'
   },
@@ -112,6 +121,17 @@ export default {
     onTimeDelivery: '定時配達',
     itemsCount: '{count}件',
     quantity: '数量',
+    submitted: {
+      title: '送信済み発注',
+      empty: '送信済みの補充発注はまだありません',
+      orderNumber: '注文番号',
+      items: '品目',
+      totalCost: '合計コスト',
+      submittedDate: '送信日',
+      leadTime: 'リードタイム',
+      leadTimeDays: '{count}日',
+      expectedDelivery: '予定配達日'
+    },
     table: {
       orderNumber: '注文番号',
       orderId: '注文ID',
@@ -188,8 +208,37 @@ export default {
     }
   },
 
+  // Restocking
+  restocking: {
+    title: '補充発注',
+    description: '予算を設定し、需要予測に基づく推奨補充数量を確認します',
+    budget: '予算',
+    spent: '使用額',
+    remaining: '残額',
+    budgetSlider: '補充予算',
+    recommendedItems: '推奨品目',
+    noRecommendations: '現在の予算に収まる品目がありません。予算を増やすと推奨が表示されます。',
+    noShortfall: '現在、在庫不足の品目はありません。',
+    placeOrder: '発注する',
+    submitting: '送信中...',
+    orderPlaced: '発注が完了しました',
+    orderSummary: '注文 {orderNumber} を送信しました。リードタイム: {days}日。',
+    orderFailed: '発注に失敗しました',
+    loadFailed: '需要予測の読み込みに失敗しました',
+    table: {
+      sku: 'SKU',
+      itemName: '品目名',
+      category: 'カテゴリ',
+      quantity: '数量',
+      unitCost: '単価',
+      lineTotal: '小計',
+      trend: 'トレンド'
+    }
+  },
+
   // Filters
   filters: {
+    resetAll: 'すべてのフィルターをリセット',
     timePeriod: '期間',
     location: '場所',
     category: 'カテゴリ',
